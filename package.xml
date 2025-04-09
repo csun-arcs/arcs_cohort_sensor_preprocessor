@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>arcs_cohort_sensor_preprocessing</name>
+  <name>arcs_cohort_sensor_preprocessor</name>
   <version>0.0.0</version>
   <description>Sensor data preprocessing tools (e.g., pointcloud to laserscan) for the ARCS CoHORT project.</description>
   <maintainer email="barry.ridge@csun.edu">bridge</maintainer>
@@ -12,7 +12,6 @@
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
   <depend>std_msgs</depend>
-  <depend>pcl_ros</depend>
   <depend>pointcloud_to_laserscan</depend>
 
   <test_depend>ament_lint_auto</test_depend>

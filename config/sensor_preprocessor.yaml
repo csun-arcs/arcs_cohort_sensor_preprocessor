@@ -1,0 +1,17 @@
+nodes:
+  - name: left_camera_scan
+    type: pointcloud_to_laserscan
+    input_cloud_topic: /camera/left_camera/points
+    output_scan_topic: /camera/left_camera/scan
+    frame_id: zedm_left_camera_frame
+    transform_tolerance: 0.01
+    min_height: 0.0
+    max_height: 1.0
+    angle_min: -1.57 # -pi/2
+    angle_max: 1.57  # pi/2
+    angle_increment: 0.0087 # pi/360.0
+    range_min: 0.2
+    range_max: 10.0
+    scan_time: 0.3333
+    use_inf: True
+    inf_epsilon: 1.0
