@@ -11,7 +11,9 @@
 
   <depend>rclcpp</depend>
   <depend>sensor_msgs</depend>
-  <depend>std_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_sensor_msgs</depend>
+  <depend>pcl_ros</depend>
   <depend>pointcloud_to_laserscan</depend>
 
   <test_depend>ament_lint_auto</test_depend>

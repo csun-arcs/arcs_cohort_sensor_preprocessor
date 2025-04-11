@@ -1,6 +1,9 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch_ros.actions import ComposableNodeContainer
+from launch_ros.descriptions import ComposableNode
 from ament_index_python.packages import get_package_share_directory
+
 import yaml
 import os
 
@@ -26,7 +29,7 @@ def generate_launch_description():
                     executable='pointcloud_to_laserscan_node',
                     name=node_config['name'],
                     parameters=[{
-                        'target_frame': node_config['frame_id'],
+                        'target_frame': node_config['target_frame'],
                         'transform_tolerance': node_config['transform_tolerance'],
                         'min_height': node_config['min_height'],
                         'max_height': node_config['max_height'],
@@ -42,6 +45,28 @@ def generate_launch_description():
                     remappings=[
                         ('cloud_in', node_config['input_cloud_topic']),
                         ('scan', node_config['output_scan_topic'])
+                    ],
+                    output='screen'
+                )
+            )
+        elif node_type == 'pointcloud_transformer':
+            nodes.append(
+                ComposableNodeContainer(
+                    name='pointcloud_transformer_container',
+                    namespace='',
+                    package='rclcpp_components',
+                    executable='component_container_mt',
+                    composable_node_descriptions=[
+                        ComposableNode(
+                            package='arcs_cohort_sensor_preprocessor',
+                            plugin='arcs_cohort_sensor_preprocessor::PointCloudTransformer',
+                            name=node_config['name'],
+                            parameters=[{
+                                'target_frame': node_config['target_frame'],
+                                'input_topic': node_config['input_topic'],
+                                'output_topic': node_config['output_topic'],
+                            }]
+                        ),
                     ],
                     output='screen'
                 )
