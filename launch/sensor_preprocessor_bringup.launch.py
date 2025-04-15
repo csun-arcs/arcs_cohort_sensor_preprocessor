@@ -72,6 +72,35 @@ def launch_setup(context, *args, **kwargs):
                 )
             )
 
+        elif node_type == "laser_merger2":
+            nodes.append(
+                Node(
+                    package='laser_merger2',
+                    executable='laser_merger2',
+                    name='laser_merger2',
+                    output='screen',
+                    parameters=[{'target_frame': node_config["target_frame"]},
+                                {'scan_topics': node_config["scan_topics"]},
+                                {'qos_profiles': node_config["qos_profiles"]},
+                                {'transform_tolerance': node_config["transform_tolerance"]},
+                                {'rate': node_config["rate"]},
+                                {'queue_size': node_config["queue_size"]},
+                                {'max_range': node_config["max_range"]},
+                                {'min_range': node_config["min_range"]},
+                                {'max_angle': node_config["max_angle"]},
+                                {'min_angle': node_config["min_angle"]},
+                                {'scan_time': node_config["scan_time"]},
+                                {'angle_increment': node_config["angle_increment"]},
+                                {'inf_epsilon': node_config["inf_epsilon"]},
+                                {'use_inf': node_config["use_inf"]}
+                                ],
+                    remappings=[
+                        ('/pointcloud', node_config["output_pointcloud_topic"]),
+                        ('/scan', node_config["output_scan_topic"])
+                    ],
+                    arguments=['--ros-args', '--log-level', 'DEBUG'],
+                ))
+
         else:
             print(f"[sensor_preprocessor_bringup.launch.py] Warning: Unknown node type '{node_type}'")
 
