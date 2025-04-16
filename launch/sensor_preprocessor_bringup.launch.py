@@ -123,12 +123,12 @@ def generate_launch_description():
     default_log_level = "INFO"
 
     # Declare launch arguments
-    declare_config_file_cmd = DeclareLaunchArgument(
+    declare_config_file_arg = DeclareLaunchArgument(
         "config_file",
         default_value=default_config,
         description="Path to the sensor preprocessor YAML configuration file."
     )
-    declare_log_level_cmd = DeclareLaunchArgument(
+    declare_log_level_arg = DeclareLaunchArgument(
         "log_level",
         default_value=default_log_level,
         description="Set the log level for nodes."
@@ -136,8 +136,8 @@ def generate_launch_description():
 
     return LaunchDescription([
         # Launch arguments
-        declare_config_file_cmd,
-        declare_log_level_cmd,
+        declare_config_file_arg,
+        declare_log_level_arg,
         # Nodes
         OpaqueFunction(function=launch_setup)
     ])
