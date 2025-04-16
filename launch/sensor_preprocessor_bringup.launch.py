@@ -47,7 +47,7 @@ def launch_setup(context, *args, **kwargs):
                         ("scan", node_config["output_scan_topic"]),
                     ],
                     output="screen",
-                    arguments=['--ros-args', '--log-level', log_level],
+                    arguments=["--ros-args", "--log-level", log_level],
                 )
             )
 
@@ -71,7 +71,7 @@ def launch_setup(context, *args, **kwargs):
                         ),
                     ],
                     output="screen",
-                    arguments=['--ros-args', '--log-level', log_level],
+                    arguments=["--ros-args", "--log-level", log_level],
                 )
             )
 
@@ -101,7 +101,7 @@ def launch_setup(context, *args, **kwargs):
                         ('/scan', node_config["output_scan_topic"])
                     ],
                     output='screen',
-                    arguments=['--ros-args', '--log-level', log_level],
+                    arguments=["--ros-args", "--log-level", log_level],
                 ))
 
         else:
