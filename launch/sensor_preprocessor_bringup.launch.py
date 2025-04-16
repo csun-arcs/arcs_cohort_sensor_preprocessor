@@ -12,6 +12,7 @@ from ament_index_python.packages import get_package_share_directory
 
 def launch_setup(context, *args, **kwargs):
     config_file = LaunchConfiguration("config_file").perform(context)
+    log_level = LaunchConfiguration("log_level").perform(context)
 
     with open(config_file, "r") as f:
         config = yaml.safe_load(f)
@@ -45,7 +46,8 @@ def launch_setup(context, *args, **kwargs):
                         ("cloud_in", node_config["input_cloud_topic"]),
                         ("scan", node_config["output_scan_topic"]),
                     ],
-                    output="screen"
+                    output="screen",
+                    arguments=['--ros-args', '--log-level', log_level],
                 )
             )
 
@@ -68,7 +70,8 @@ def launch_setup(context, *args, **kwargs):
                             }]
                         ),
                     ],
-                    output="screen"
+                    output="screen",
+                    arguments=['--ros-args', '--log-level', log_level],
                 )
             )
 
@@ -78,7 +81,6 @@ def launch_setup(context, *args, **kwargs):
                     package='laser_merger2',
                     executable='laser_merger2',
                     name='laser_merger2',
-                    output='screen',
                     parameters=[{'target_frame': node_config["target_frame"]},
                                 {'scan_topics': node_config["scan_topics"]},
                                 {'qos_profiles': node_config["qos_profiles"]},
@@ -98,7 +100,8 @@ def launch_setup(context, *args, **kwargs):
                         ('/pointcloud', node_config["output_pointcloud_topic"]),
                         ('/scan', node_config["output_scan_topic"])
                     ],
-                    arguments=['--ros-args', '--log-level', 'DEBUG'],
+                    output='screen',
+                    arguments=['--ros-args', '--log-level', log_level],
                 ))
 
         else:
@@ -117,6 +120,7 @@ def generate_launch_description():
         "config",
         "sensor_preprocessor.yaml"
     )
+    default_log_level = "INFO"
 
     # Declare launch arguments
     declare_config_file_cmd = DeclareLaunchArgument(
@@ -124,10 +128,16 @@ def generate_launch_description():
         default_value=default_config,
         description="Path to the sensor preprocessor YAML configuration file."
     )
+    declare_log_level_cmd = DeclareLaunchArgument(
+        "log_level",
+        default_value=default_log_level,
+        description="Set the log level for nodes."
+    )
 
     return LaunchDescription([
         # Launch arguments
         declare_config_file_cmd,
+        declare_log_level_cmd,
         # Nodes
         OpaqueFunction(function=launch_setup)
     ])
