@@ -97,8 +97,8 @@ def launch_setup(context, *args, **kwargs):
                                 {'use_inf': node_config["use_inf"]}
                                 ],
                     remappings=[
-                        ('/pointcloud', node_config["output_pointcloud_topic"]),
-                        ('/scan', node_config["output_scan_topic"])
+                        ('pointcloud', node_config["output_pointcloud_topic"]),
+                        ('scan', node_config["output_scan_topic"])
                     ],
                     output='screen',
                     arguments=["--ros-args", "--log-level", log_level],
