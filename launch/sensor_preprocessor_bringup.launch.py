@@ -12,13 +12,27 @@ from ament_index_python.packages import get_package_share_directory
 
 def launch_setup(context, *args, **kwargs):
     config_file = LaunchConfiguration("config_file").perform(context)
+    namespace = LaunchConfiguration("namespace").perform(context)
+    prefix = LaunchConfiguration("prefix").perform(context)
     log_level = LaunchConfiguration("log_level").perform(context)
 
+    # Build the prefix with underscore.
+    # This expression will evaluate to, for example, "cohort_" if
+    # the prefix is "cohort", or to an empty string if prefix is empty.
+    prefix_ = prefix + "_" if prefix else ""
+
+    # Load config file as a string
     with open(config_file, "r") as f:
-        config = yaml.safe_load(f)
+        config_str = f.read()
 
+    # Substitute template variables
+    config_str = config_str.format(prefix_=prefix_)
+
+    # Load as YAML
+    config = yaml.safe_load(config_str)
+
+    # Launch sensor preprocessing nodes
     nodes = []
-
     for node_config in config.get("nodes", []):
         node_type = node_config.get("type")
 
@@ -28,6 +42,7 @@ def launch_setup(context, *args, **kwargs):
                     package="pointcloud_to_laserscan",
                     executable="pointcloud_to_laserscan_node",
                     name=node_config["name"],
+                    namespace=namespace,
                     parameters=[{
                         "target_frame": node_config["target_frame"],
                         "transform_tolerance": node_config["transform_tolerance"],
@@ -54,10 +69,10 @@ def launch_setup(context, *args, **kwargs):
         elif node_type == "pointcloud_transformer":
             nodes.append(
                 ComposableNodeContainer(
-                    name="pointcloud_transformer_container",
-                    namespace="",
                     package="rclcpp_components",
                     executable="component_container_mt",
+                    name="pointcloud_transformer_container",
+                    namespace=namespace,
                     composable_node_descriptions=[
                         ComposableNode(
                             package="arcs_cohort_sensor_preprocessor",
@@ -81,6 +96,7 @@ def launch_setup(context, *args, **kwargs):
                     package='laser_merger2',
                     executable='laser_merger2',
                     name='laser_merger2',
+                    namespace=namespace,
                     parameters=[{'target_frame': node_config["target_frame"]},
                                 {'scan_topics': node_config["scan_topics"]},
                                 {'qos_profiles': node_config["qos_profiles"]},
@@ -128,6 +144,20 @@ def generate_launch_description():
         default_value=default_config,
         description="Path to the sensor preprocessor YAML configuration file."
     )
+    declare_namespace_arg = DeclareLaunchArgument(
+        "namespace",
+        default_value="",
+        description="Namespace under which to bring up nodes, topics, etc.",
+    )
+    declare_prefix_arg = DeclareLaunchArgument(
+        "prefix",
+        default_value="",
+        description=(
+            "A prefix for the names of joints, links, etc. in the robot model). "
+            "E.g. 'base_link' will become 'cohort1_base_link' if prefix "
+            "is set to 'cohort1'."
+        ),
+    )
     declare_log_level_arg = DeclareLaunchArgument(
         "log_level",
         default_value=default_log_level,
@@ -137,6 +167,8 @@ def generate_launch_description():
     return LaunchDescription([
         # Launch arguments
         declare_config_file_arg,
+        declare_namespace_arg,
+        declare_prefix_arg,
         declare_log_level_arg,
         # Nodes
         OpaqueFunction(function=launch_setup)
