@@ -6,13 +6,12 @@ from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node, ComposableNodeContainer
 from launch_ros.descriptions import ComposableNode
-from launch.utilities import perform_substitutions
 from ament_index_python.packages import get_package_share_directory
 
 
 def launch_setup(context, *args, **kwargs):
     config_file = LaunchConfiguration("config_file").perform(context)
-    namespace = LaunchConfiguration("namespace").perform(context)
+    namespace = LaunchConfiguration("ns").perform(context)
     prefix = LaunchConfiguration("prefix").perform(context)
     log_level = LaunchConfiguration("log_level").perform(context)
 
@@ -145,7 +144,7 @@ def generate_launch_description():
         description="Path to the sensor preprocessor YAML configuration file."
     )
     declare_namespace_arg = DeclareLaunchArgument(
-        "namespace",
+        "ns",
         default_value="",
         description="Namespace under which to bring up nodes, topics, etc.",
     )
@@ -171,5 +170,5 @@ def generate_launch_description():
         declare_prefix_arg,
         declare_log_level_arg,
         # Nodes
-        OpaqueFunction(function=launch_setup)
+        OpaqueFunction(function=launch_setup),
     ])
