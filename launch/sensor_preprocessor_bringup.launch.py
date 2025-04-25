@@ -4,15 +4,14 @@ import yaml
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node, ComposableNodeContainer
+from launch_ros.actions import Node, ComposableNodeContainer, PushRosNamespace
 from launch_ros.descriptions import ComposableNode
 from ament_index_python.packages import get_package_share_directory
 
 
 def launch_setup(context, *args, **kwargs):
-    config_file = LaunchConfiguration("config_file").perform(context)
-    namespace = LaunchConfiguration("ns").perform(context)
     prefix = LaunchConfiguration("prefix").perform(context)
+    config_file = LaunchConfiguration("config_file").perform(context)
     log_level = LaunchConfiguration("log_level").perform(context)
 
     # Build the prefix with underscore.
@@ -41,7 +40,6 @@ def launch_setup(context, *args, **kwargs):
                     package="pointcloud_to_laserscan",
                     executable="pointcloud_to_laserscan_node",
                     name=node_config["name"],
-                    namespace=namespace,
                     parameters=[{
                         "target_frame": node_config["target_frame"],
                         "transform_tolerance": node_config["transform_tolerance"],
@@ -56,12 +54,14 @@ def launch_setup(context, *args, **kwargs):
                         "use_inf": node_config["use_inf"],
                         "inf_epsilon": node_config["inf_epsilon"],
                     }],
+                    output="screen",
+                    arguments=["--ros-args", "--log-level", log_level],
                     remappings=[
+                        ('/tf', 'tf'),
+                        ('/tf_static', 'tf_static'),
                         ("cloud_in", node_config["input_cloud_topic"]),
                         ("scan", node_config["output_scan_topic"]),
                     ],
-                    output="screen",
-                    arguments=["--ros-args", "--log-level", log_level],
                 )
             )
 
@@ -71,7 +71,7 @@ def launch_setup(context, *args, **kwargs):
                     package="rclcpp_components",
                     executable="component_container_mt",
                     name="pointcloud_transformer_container",
-                    namespace=namespace,
+                    namespace="",
                     composable_node_descriptions=[
                         ComposableNode(
                             package="arcs_cohort_sensor_preprocessor",
@@ -86,6 +86,10 @@ def launch_setup(context, *args, **kwargs):
                     ],
                     output="screen",
                     arguments=["--ros-args", "--log-level", log_level],
+                    remappings=[
+                        ('/tf', 'tf'),
+                        ('/tf_static', 'tf_static'),
+                    ],
                 )
             )
 
@@ -95,7 +99,6 @@ def launch_setup(context, *args, **kwargs):
                     package='laser_merger2',
                     executable='laser_merger2',
                     name='laser_merger2',
-                    namespace=namespace,
                     parameters=[{'target_frame': node_config["target_frame"]},
                                 {'scan_topics': node_config["scan_topics"]},
                                 {'qos_profiles': node_config["qos_profiles"]},
@@ -111,12 +114,14 @@ def launch_setup(context, *args, **kwargs):
                                 {'inf_epsilon': node_config["inf_epsilon"]},
                                 {'use_inf': node_config["use_inf"]}
                                 ],
+                    output='screen',
+                    arguments=["--ros-args", "--log-level", log_level],
                     remappings=[
+                        ('/tf', 'tf'),
+                        ('/tf_static', 'tf_static'),
                         ('pointcloud', node_config["output_pointcloud_topic"]),
                         ('scan', node_config["output_scan_topic"])
                     ],
-                    output='screen',
-                    arguments=["--ros-args", "--log-level", log_level],
                 ))
 
         else:
@@ -138,15 +143,15 @@ def generate_launch_description():
     default_log_level = "INFO"
 
     # Declare launch arguments
+    declare_namespace_arg = DeclareLaunchArgument(
+        "namespace",
+        default_value="",
+        description="Namespace under which to bring up nodes, topics, etc.",
+    )
     declare_config_file_arg = DeclareLaunchArgument(
         "config_file",
         default_value=default_config,
         description="Path to the sensor preprocessor YAML configuration file."
-    )
-    declare_namespace_arg = DeclareLaunchArgument(
-        "ns",
-        default_value="",
-        description="Namespace under which to bring up nodes, topics, etc.",
     )
     declare_prefix_arg = DeclareLaunchArgument(
         "prefix",
@@ -163,12 +168,21 @@ def generate_launch_description():
         description="Set the log level for nodes."
     )
 
+    # Launch configurations
+    namespace = LaunchConfiguration("namespace")
+
+    # Use PushRosNamespace to apply the namespace to all nodes below
+    push_namespace = PushRosNamespace(namespace=namespace)
+
     return LaunchDescription([
         # Launch arguments
-        declare_config_file_arg,
         declare_namespace_arg,
         declare_prefix_arg,
+        declare_config_file_arg,
         declare_log_level_arg,
+        # declare_use_namespace_arg,
+        # Namespace
+        push_namespace,
         # Nodes
         OpaqueFunction(function=launch_setup),
     ])
