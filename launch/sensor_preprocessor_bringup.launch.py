@@ -2,7 +2,7 @@ import os
 import yaml
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, LogInfo, GroupAction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node, ComposableNodeContainer, PushRosNamespace
 from launch_ros.descriptions import ComposableNode
@@ -10,9 +10,16 @@ from ament_index_python.packages import get_package_share_directory
 
 
 def launch_setup(context, *args, **kwargs):
+    namespace = LaunchConfiguration("namespace").perform(context)
     prefix = LaunchConfiguration("prefix").perform(context)
     config_file = LaunchConfiguration("config_file").perform(context)
     log_level = LaunchConfiguration("log_level").perform(context)
+
+    # Log info
+    log_info = LogInfo(msg=['Sensor preprocessor bringup launching with namespace: ', namespace, ', prefix: ', prefix])
+
+    # Use PushRosNamespace to apply the namespace to all nodes below
+    push_namespace = PushRosNamespace(namespace=namespace)
 
     # Build the prefix with underscore.
     # This expression will evaluate to, for example, "cohort_" if
@@ -127,8 +134,13 @@ def launch_setup(context, *args, **kwargs):
         else:
             print(f"[sensor_preprocessor_bringup.launch.py] Warning: Unknown node type '{node_type}'")
 
-    return nodes
-
+    return [
+        GroupAction([
+            log_info,
+            push_namespace,
+            *nodes
+        ])
+    ]
 
 def generate_launch_description():
     # Packages
@@ -168,20 +180,12 @@ def generate_launch_description():
         description="Set the log level for nodes."
     )
 
-    # Launch configurations
-    namespace = LaunchConfiguration("namespace")
-
-    # Use PushRosNamespace to apply the namespace to all nodes below
-    push_namespace = PushRosNamespace(namespace=namespace)
-
     return LaunchDescription([
         # Launch arguments
         declare_namespace_arg,
         declare_prefix_arg,
         declare_config_file_arg,
         declare_log_level_arg,
-        # Namespace
-        push_namespace,
         # Nodes
         OpaqueFunction(function=launch_setup),
     ])
