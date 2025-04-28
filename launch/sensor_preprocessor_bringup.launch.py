@@ -180,7 +180,6 @@ def generate_launch_description():
         declare_prefix_arg,
         declare_config_file_arg,
         declare_log_level_arg,
-        # declare_use_namespace_arg,
         # Namespace
         push_namespace,
         # Nodes
