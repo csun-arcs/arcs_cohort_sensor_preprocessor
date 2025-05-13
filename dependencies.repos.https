@@ -1,0 +1,5 @@
+repositories:
+  laser_merger2:
+    type: git
+    url: https://github.com/csun-arcs/laser_merger2.git
+    version: main
