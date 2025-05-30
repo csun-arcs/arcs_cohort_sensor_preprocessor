@@ -198,6 +198,39 @@ def launch_setup(context, *args, **kwargs):
                 )
             )
 
+        elif node_type == "image_resize":
+
+            input_topic = node_config["input_topic"] if "input_topic" in node_config else "camera/image_raw/compressed"
+            output_topic = node_config["output_topic"] if "output_topic" in node_config else "camera/image_thumbnail"
+            width = node_config["width"] if "width" in node_config else 320
+            height = node_config["height"] if "height" in node_config else 240
+
+            nodes.append(
+                ComposableNodeContainer(
+                    package="rclcpp_components",
+                    executable="component_container",
+                    name="image_proc_container",
+                    namespace="",
+                    composable_node_descriptions=[
+                        ComposableNode(
+                            package="image_proc",
+                            plugin="image_proc::ResizeNode",
+                            name=node_config["name"],
+                            remappings=[
+                                ("image", input_topic),
+                                ("image_resized", output_topic),
+                            ],
+                            parameters=[{
+                                "width": width,
+                                "height": height,
+                            }],
+                        ),
+                    ],
+                    output='screen',
+                    arguments=['--ros-args', '--log-level', log_level],
+                )
+            )
+
         else:
             print(f"[sensor_preprocessor_bringup.launch.py] Warning: Unknown node type '{node_type}'")
 
