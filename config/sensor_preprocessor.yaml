@@ -22,7 +22,7 @@ nodes:
     scan_topics:
       - lidar/scan
       - camera/scan
-    qos_profiles:
+    scan_reliability_policies:
       - reliable
       - besteffort
     transform_tolerance: 0.1
@@ -37,4 +37,6 @@ nodes:
     inf_epsilon: 1.0
     use_inf: True
     output_pointcloud_topic: scan/merged/points
+    output_pointcloud_durability_policy: transient_local
     output_scan_topic: scan/merged/scan
+    output_scan_durability_policy: transient_local
