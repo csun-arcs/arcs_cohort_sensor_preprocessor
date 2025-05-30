@@ -167,6 +167,37 @@ def launch_setup(context, *args, **kwargs):
                     ],
                 ))
 
+        elif node_type == "image_transport":
+
+            input_transport = node_config["input_transport"] if "input_transport" in node_config else "raw"
+            output_transport = node_config["output_transport"] if "output_transport" in node_config else "raw"
+            input_topic = node_config["input_topic"] if "input_topic" in node_config else "in"
+            output_topic = node_config["output_topic"] if "output_topic" in node_config else "out"
+            output_compressed_topic = node_config["output_compressed_topic"] if "output_compressed_topic" in node_config else "out/compressed"
+            output_theora_topic = node_config["output_theora_topic"] if "output_theora_topic" in node_config else "out/theora"
+            jpeg_quality = node_config["jpeg_quality"] if "jpeg_quality" in node_config else 80
+
+            nodes.append(
+                Node(
+                    package="image_transport",
+                    executable="republish",
+                    name=node_config["name"],
+                    parameters=[
+                        {"jpeg_quality": jpeg_quality},
+                    ],
+                    output="screen",
+                    arguments=[input_transport, output_transport, "--ros-args", "--log-level", log_level],
+                    remappings=[
+                        ("/tf", "tf"),
+                        ("/tf_static", "tf_static"),
+                        ("in", input_topic),
+                        ("out", output_topic),
+                        ("out/compressed", output_compressed_topic),
+                        ("out/theora", output_theora_topic),
+                    ],
+                )
+            )
+
         else:
             print(f"[sensor_preprocessor_bringup.launch.py] Warning: Unknown node type '{node_type}'")
 
