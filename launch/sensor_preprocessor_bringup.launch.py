@@ -94,40 +94,76 @@ def launch_setup(context, *args, **kwargs):
                     output="screen",
                     arguments=["--ros-args", "--log-level", log_level],
                     remappings=[
-                        ('/tf', 'tf'),
-                        ('/tf_static', 'tf_static'),
+                        ("/tf", "tf"),
+                        ("/tf_static", "tf_static"),
                     ],
                 )
             )
 
         elif node_type == "laser_merger2":
+
+            scan_topics = node_config["scan_topics"] if "scan_topics" in node_config else [""]
+            scan_reliability_policies = node_config["scan_reliability_policies"] if "scan_reliability_policies" in node_config else [""]
+            scan_history_policies = node_config["scan_history_policies"] if "scan_history_policies" in node_config else [""]
+            scan_depths = node_config["scan_depths"] if "scan_depths" in node_config else [20]
+            scan_durability_policies = node_config["scan_durability_policies"] if "scan_durability_policies" in node_config else [""]
+            point_cloud_topics = node_config["point_cloud_topics"] if "point_cloud_topics" in node_config else [""]
+            point_cloud_reliability_policies = node_config["point_cloud_reliability_policies"] if "point_cloud_reliability_policies" in node_config else [""]
+            point_cloud_history_policies = node_config["point_cloud_history_policies"] if "point_cloud_history_policies" in node_config else [""]
+            point_cloud_depths = node_config["point_cloud_depths"] if "point_cloud_depths" in node_config else [20]
+            point_cloud_durability_policies = node_config["point_cloud_durability_policies"] if "point_cloud_durability_policies" in node_config else [""]
+            output_scan_reliability_policy = node_config["output_scan_reliability_policy"] if "output_scan_reliability_policy" in node_config else ""
+            output_scan_history_policy = node_config["output_scan_history_policy"] if "output_scan_history_policy" in node_config else ""
+            output_scan_depth = node_config["output_scan_depth"] if "output_scan_depth" in node_config else 20
+            output_scan_durability_policy = node_config["output_scan_durability_policy"] if "output_scan_durability_policy" in node_config else ""
+            output_point_cloud_reliability_policy = node_config["output_point_cloud_reliability_policy"] if "output_point_cloud_reliability_policy" in node_config else ""
+            output_point_cloud_history_policy = node_config["output_point_cloud_history_policy"] if "output_point_cloud_history_policy" in node_config else ""
+            output_point_cloud_depth = node_config["output_point_cloud_depth"] if "output_point_cloud_depth" in node_config else 20
+            output_point_cloud_durability_policy = node_config["output_point_cloud_durability_policy"] if "output_point_cloud_durability_policy" in node_config else ""
+
             nodes.append(
                 Node(
-                    package='laser_merger2',
-                    executable='laser_merger2',
-                    name='laser_merger2',
-                    parameters=[{'target_frame': node_config["target_frame"]},
-                                {'scan_topics': node_config["scan_topics"]},
-                                {'qos_profiles': node_config["qos_profiles"]},
-                                {'transform_tolerance': node_config["transform_tolerance"]},
-                                {'rate': node_config["rate"]},
-                                {'queue_size': node_config["queue_size"]},
-                                {'max_range': node_config["max_range"]},
-                                {'min_range': node_config["min_range"]},
-                                {'max_angle': node_config["max_angle"]},
-                                {'min_angle': node_config["min_angle"]},
-                                {'scan_time': node_config["scan_time"]},
-                                {'angle_increment': node_config["angle_increment"]},
-                                {'inf_epsilon': node_config["inf_epsilon"]},
-                                {'use_inf': node_config["use_inf"]}
+                    package="laser_merger2",
+                    executable="laser_merger2",
+                    name="laser_merger2",
+                    parameters=[{"target_frame": node_config["target_frame"]},
+                                {"scan_topics": scan_topics},
+                                {"scan_reliability_policies": scan_reliability_policies},
+                                {"scan_history_policies": scan_history_policies},
+                                {"scan_depths": scan_depths},
+                                {"scan_durability_policies": scan_durability_policies},
+                                {"point_cloud_topics": point_cloud_topics},
+                                {"point_cloud_reliability_policies": point_cloud_reliability_policies},
+                                {"point_cloud_history_policies": point_cloud_history_policies},
+                                {"point_cloud_depths": point_cloud_depths},
+                                {"point_cloud_durability_policies": point_cloud_durability_policies},
+                                {"output_scan_reliability_policy": output_scan_reliability_policy},
+                                {"output_scan_history_policy": output_scan_history_policy},
+                                {"output_scan_depth": output_scan_depth},
+                                {"output_scan_durability_policy": output_scan_durability_policy},
+                                {"output_point_cloud_reliability_policy": output_point_cloud_reliability_policy},
+                                {"output_point_cloud_history_policy": output_point_cloud_history_policy},
+                                {"output_point_cloud_depth": output_point_cloud_depth},
+                                {"output_point_cloud_durability_policy": output_point_cloud_durability_policy},
+                                {"transform_tolerance": node_config["transform_tolerance"]},
+                                {"rate": node_config["rate"]},
+                                {"queue_size": node_config["queue_size"]},
+                                {"max_range": node_config["max_range"]},
+                                {"min_range": node_config["min_range"]},
+                                {"max_angle": node_config["max_angle"]},
+                                {"min_angle": node_config["min_angle"]},
+                                {"scan_time": node_config["scan_time"]},
+                                {"angle_increment": node_config["angle_increment"]},
+                                {"inf_epsilon": node_config["inf_epsilon"]},
+                                {"use_inf": node_config["use_inf"]}
                                 ],
                     output='screen',
                     arguments=["--ros-args", "--log-level", log_level],
                     remappings=[
-                        ('/tf', 'tf'),
-                        ('/tf_static', 'tf_static'),
-                        ('pointcloud', node_config["output_pointcloud_topic"]),
-                        ('scan', node_config["output_scan_topic"])
+                        ("/tf", "tf"),
+                        ("/tf_static", "tf_static"),
+                        ("pointcloud", node_config["output_pointcloud_topic"]),
+                        ("scan", node_config["output_scan_topic"])
                     ],
                 ))
 
