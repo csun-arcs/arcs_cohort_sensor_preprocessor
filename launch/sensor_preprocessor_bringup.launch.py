@@ -173,8 +173,6 @@ def launch_setup(context, *args, **kwargs):
             output_transport = node_config["output_transport"] if "output_transport" in node_config else "raw"
             input_topic = node_config["input_topic"] if "input_topic" in node_config else "in"
             output_topic = node_config["output_topic"] if "output_topic" in node_config else "out"
-            output_compressed_topic = node_config["output_compressed_topic"] if "output_compressed_topic" in node_config else "out/compressed"
-            output_theora_topic = node_config["output_theora_topic"] if "output_theora_topic" in node_config else "out/theora"
             jpeg_quality = node_config["jpeg_quality"] if "jpeg_quality" in node_config else 80
 
             nodes.append(
@@ -192,16 +190,19 @@ def launch_setup(context, *args, **kwargs):
                         ("/tf_static", "tf_static"),
                         ("in", input_topic),
                         ("out", output_topic),
-                        ("out/compressed", output_compressed_topic),
-                        ("out/theora", output_theora_topic),
+                        ("out/compressed", [output_topic, "/compressed"]),
+                        ("out/compressedDepth", [output_topic, "/compressedDepth"]),
+                        ("out/theora", [output_topic, "/theora"]),
                     ],
                 )
             )
 
         elif node_type == "image_resize":
 
-            input_topic = node_config["input_topic"] if "input_topic" in node_config else "camera/image_raw/compressed"
-            output_topic = node_config["output_topic"] if "output_topic" in node_config else "camera/image_thumbnail"
+            input_image_topic = node_config["input_image_topic"] if "input_image_topic" in node_config else "image/image_raw"
+            input_camera_info_topic = node_config["input_camera_info_topic"] if "input_camera_info_topic" in node_config else "image/camera_info"
+            output_image_topic = node_config["output_image_topic"] if "output_image_topic" in node_config else "resize/image_raw"
+            output_camera_info_topic = node_config["output_camera_info_topic"] if "output_camera_info_topic" in node_config else "resize/camera_info"
             width = node_config["width"] if "width" in node_config else 320
             height = node_config["height"] if "height" in node_config else 240
 
@@ -217,8 +218,13 @@ def launch_setup(context, *args, **kwargs):
                             plugin="image_proc::ResizeNode",
                             name=node_config["name"],
                             remappings=[
-                                ("image", input_topic),
-                                ("image_resized", output_topic),
+                                ("image/image_raw", input_image_topic),
+                                ("image/camera_info", input_camera_info_topic),
+                                ("resize/image_raw", output_image_topic),
+                                ("resize/camera_info", output_camera_info_topic),
+                                ("resize/image_raw/compressed", [output_image_topic, "/compressed"]),
+                                ("resize/image_raw/compressedDepth", [output_image_topic, "/compressedDepth"]),
+                                ("resize/image_raw/theora", [output_image_topic, "/theora"]),
                             ],
                             parameters=[{
                                 "width": width,
