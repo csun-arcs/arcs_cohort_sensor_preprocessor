@@ -38,6 +38,7 @@ def launch_setup(context, *args, **kwargs):
 
     # Launch sensor preprocessing nodes
     nodes = []
+    composable_nodes = []
     for node_config in config.get("nodes", []):
         node_type = node_config.get("type")
 
@@ -73,30 +74,16 @@ def launch_setup(context, *args, **kwargs):
             )
 
         elif node_type == "pointcloud_transformer":
-            nodes.append(
-                ComposableNodeContainer(
-                    package="rclcpp_components",
-                    executable="component_container_mt",
-                    name="pointcloud_transformer_container",
-                    namespace="",
-                    composable_node_descriptions=[
-                        ComposableNode(
-                            package="arcs_cohort_sensor_preprocessor",
-                            plugin="arcs_cohort_sensor_preprocessor::PointCloudTransformer",
-                            name=node_config["name"],
-                            parameters=[{
-                                "target_frame": node_config["target_frame"],
-                                "input_topic": node_config["input_topic"],
-                                "output_topic": node_config["output_topic"],
-                            }]
-                        ),
-                    ],
-                    output="screen",
-                    arguments=["--ros-args", "--log-level", log_level],
-                    remappings=[
-                        ("/tf", "tf"),
-                        ("/tf_static", "tf_static"),
-                    ],
+            composable_nodes.append(
+                ComposableNode(
+                    package="arcs_cohort_sensor_preprocessor",
+                    plugin="arcs_cohort_sensor_preprocessor::PointCloudTransformer",
+                    name=node_config["name"],
+                    parameters=[{
+                        "target_frame": node_config["target_frame"],
+                        "input_topic": node_config["input_topic"],
+                        "output_topic": node_config["output_topic"],
+                    }]
                 )
             )
 
@@ -206,39 +193,43 @@ def launch_setup(context, *args, **kwargs):
             width = node_config["width"] if "width" in node_config else 320
             height = node_config["height"] if "height" in node_config else 240
 
-            nodes.append(
-                ComposableNodeContainer(
-                    package="rclcpp_components",
-                    executable="component_container",
-                    name="image_proc_container",
-                    namespace="",
-                    composable_node_descriptions=[
-                        ComposableNode(
-                            package="image_proc",
-                            plugin="image_proc::ResizeNode",
-                            name=node_config["name"],
-                            remappings=[
-                                ("image/image_raw", input_image_topic),
-                                ("image/camera_info", input_camera_info_topic),
-                                ("resize/image_raw", output_image_topic),
-                                ("resize/camera_info", output_camera_info_topic),
-                                ("resize/image_raw/compressed", [output_image_topic, "/compressed"]),
-                                ("resize/image_raw/compressedDepth", [output_image_topic, "/compressedDepth"]),
-                                ("resize/image_raw/theora", [output_image_topic, "/theora"]),
-                            ],
-                            parameters=[{
-                                "width": width,
-                                "height": height,
-                            }],
-                        ),
+            composable_nodes.append(
+                ComposableNode(
+                    package="image_proc",
+                    plugin="image_proc::ResizeNode",
+                    name=node_config["name"],
+                    remappings=[
+                        ("image/image_raw", input_image_topic),
+                        ("image/camera_info", input_camera_info_topic),
+                        ("resize/image_raw", output_image_topic),
+                        ("resize/camera_info", output_camera_info_topic),
+                        ("resize/image_raw/compressed", [output_image_topic, "/compressed"]),
+                        ("resize/image_raw/compressedDepth", [output_image_topic, "/compressedDepth"]),
+                        ("resize/image_raw/theora", [output_image_topic, "/theora"]),
                     ],
-                    output='screen',
-                    arguments=['--ros-args', '--log-level', log_level],
+                    parameters=[{
+                        "width": width,
+                        "height": height,
+                    }],
                 )
             )
 
         else:
             print(f"[sensor_preprocessor_bringup.launch.py] Warning: Unknown node type '{node_type}'")
+
+
+    # Create a container for the composable nodes
+    nodes.append(
+        ComposableNodeContainer(
+            package="rclcpp_components",
+            executable="component_container",
+            name="composable_nodes_container",
+            namespace="",
+            composable_node_descriptions=composable_nodes,
+            output='screen',
+            arguments=['--ros-args', '--log-level', log_level],
+        )
+    )
 
     return [
         GroupAction([
