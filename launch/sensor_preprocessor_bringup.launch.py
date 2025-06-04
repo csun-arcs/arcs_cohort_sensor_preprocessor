@@ -246,6 +246,7 @@ def launch_setup(context, *args, **kwargs):
                         "input_frame": input_frame,
                         "output_frame": output_frame,
                         "leaf_size": leaf_size,
+                        "min_points_per_voxel": min_points_per_voxel,
                     }],
                 )
             )
