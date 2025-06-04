@@ -3,3 +3,7 @@ repositories:
     type: git
     url: git@github.com:csun-arcs/laser_merger2.git
     version: main
+  perception_pcl:
+    type: git
+    url: git@github.com:csun-arcs/perception_pcl.git
+    version: humble-dev
