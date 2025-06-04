@@ -80,6 +80,13 @@ nodes:
     #   input_frame: ""
     #   output_frame: ""
 
+    # - name: left_camera_points_radius_outlier_removal
+    #   type: radius_outlier_removal
+    #   input_topic: camera/left_camera/points
+    #   output_topic: camera/points/radius_inliers
+    #   min_neighbors: 5
+    #   radius_search: 0.1
+
     - name: left_camera_points_voxelizer
       type: voxel_grid
       input_topic: camera/left_camera/points
