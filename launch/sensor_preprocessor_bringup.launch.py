@@ -269,6 +269,32 @@ def launch_setup(context, *args, **kwargs):
                     }],
                 )
             )
+
+        elif node_type == "statistical_outlier_removal":
+
+            input_topic = node_config["input_topic"] if "input_topic" in node_config else "lidar/points"
+            output_topic = node_config["output_topic"] if "output_topic" in node_config else "lidar/points/downsampled"
+            mean_k = node_config["mean_k"] if "mean_k" in node_config else 2
+            stddev = node_config["stddev"] if "stddev" in node_config else 0.0
+            negative = node_config["negative"] if "negative" in node_config else False
+
+            composable_nodes.append(
+                ComposableNode(
+                    package="pcl_ros",
+                    plugin="pcl_ros::StatisticalOutlierRemoval",
+                    name=node_config["name"],
+                    remappings=[
+                        ("input", input_topic),
+                        ("output", output_topic),
+                    ],
+                    parameters=[{
+                        "mean_k": mean_k,
+                        "stddev": stddev,
+                        "negative": negative,
+                    }],
+                )
+            )
+
         elif node_type == "voxel_grid":
 
             input_topic = node_config["input_topic"] if "input_topic" in node_config else "lidar/points"
