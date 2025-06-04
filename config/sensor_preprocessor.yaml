@@ -87,6 +87,14 @@ nodes:
     #   min_neighbors: 5
     #   radius_search: 0.1
 
+    # - name: left_camera_points_statistical_outlier_removal
+    #   type: statistical_outlier_removal
+    #   input_topic: camera/left_camera/points
+    #   output_topic: camera/points/statistical_inliers
+    #   mean_k: 2
+    #   stddev: 0.1
+    #   negative: False
+
     - name: left_camera_points_voxelizer
       type: voxel_grid
       input_topic: camera/left_camera/points
