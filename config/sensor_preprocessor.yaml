@@ -68,6 +68,18 @@ nodes:
       width: 160
       height: 120
 
+    # - name: left_camera_points_passthrough
+    #   type: passthrough
+    #   input_topic: camera/left_camera/points
+    #   output_topic: camera/points/filtered
+    #   filter_field_name: 'z'
+    #   filter_limit_min: 0.0
+    #   filter_limit_max: 5.0
+    #   filter_limit_negative: False
+    #   keep_organized: False
+    #   input_frame: ""
+    #   output_frame: ""
+
     - name: left_camera_points_voxelizer
       type: voxel_grid
       input_topic: camera/left_camera/points
