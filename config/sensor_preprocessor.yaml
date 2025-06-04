@@ -95,6 +95,21 @@ nodes:
     #   stddev: 0.1
     #   negative: False
 
+    # - name: left_camera_points_crop_box
+    #   type: crop_box
+    #   input_topic: camera/left_camera/points
+    #   output_topic: camera/points/cropped
+    #   min_x: -1.0
+    #   max_x: 1.0
+    #   min_y: -1.0
+    #   max_y: 1.0
+    #   min_z: -1.0
+    #   max_z: 1.0
+    #   keep_organized: False
+    #   negative: False
+    #   input_frame: ""
+    #   output_frame: ""
+
     - name: left_camera_points_voxelizer
       type: voxel_grid
       input_topic: camera/left_camera/points
