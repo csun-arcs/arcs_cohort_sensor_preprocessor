@@ -247,6 +247,28 @@ def launch_setup(context, *args, **kwargs):
                 )
             )
 
+        elif node_type == "radius_outlier_removal":
+
+            input_topic = node_config["input_topic"] if "input_topic" in node_config else "lidar/points"
+            output_topic = node_config["output_topic"] if "output_topic" in node_config else "lidar/points/downsampled"
+            min_neighbors = node_config["min_neighbors"] if "min_neighbors" in node_config else 5
+            radius_search = node_config["radius_search"] if "radius_search" in node_config else 0.1
+
+            composable_nodes.append(
+                ComposableNode(
+                    package="pcl_ros",
+                    plugin="pcl_ros::RadiusOutlierRemoval",
+                    name=node_config["name"],
+                    remappings=[
+                        ("input", input_topic),
+                        ("output", output_topic),
+                    ],
+                    parameters=[{
+                        "min_neighbors": min_neighbors,
+                        "radius_search": radius_search,
+                    }],
+                )
+            )
         elif node_type == "voxel_grid":
 
             input_topic = node_config["input_topic"] if "input_topic" in node_config else "lidar/points"
