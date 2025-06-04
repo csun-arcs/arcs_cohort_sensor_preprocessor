@@ -295,6 +295,45 @@ def launch_setup(context, *args, **kwargs):
                 )
             )
 
+        elif node_type == "crop_box":
+
+            input_topic = node_config["input_topic"] if "input_topic" in node_config else "lidar/points"
+            output_topic = node_config["output_topic"] if "output_topic" in node_config else "lidar/points/downsampled"
+            min_x = node_config["min_x"] if "min_x" in node_config else -1.0
+            max_x = node_config["max_x"] if "max_x" in node_config else 1.0
+            min_y = node_config["min_y"] if "min_y" in node_config else -1.0
+            max_y = node_config["max_y"] if "max_y" in node_config else 1.0
+            min_z = node_config["min_z"] if "min_z" in node_config else -1.0
+            max_z = node_config["max_z"] if "max_z" in node_config else 1.0
+            keep_organized = node_config["keep_organized"] if "keep_organized" in node_config else False
+            negative = node_config["negative"] if "negative" in node_config else False
+            input_frame = node_config["input_frame"] if "input_frame" in node_config else ""
+            output_frame = node_config["output_frame"] if "output_frame" in node_config else ""
+
+            composable_nodes.append(
+                ComposableNode(
+                    package="pcl_ros",
+                    plugin="pcl_ros::CropBox",
+                    name=node_config["name"],
+                    remappings=[
+                        ("input", input_topic),
+                        ("output", output_topic),
+                    ],
+                    parameters=[{
+                        "min_x": min_x,
+                        "max_x": max_x,
+                        "min_y": min_y,
+                        "max_y": max_y,
+                        "min_z": min_z,
+                        "max_z": max_z,
+                        "keep_organized": keep_organized,
+                        "negative": negative,
+                        "input_frame": input_frame,
+                        "output_frame": output_frame,
+                    }],
+                )
+            )
+
         elif node_type == "voxel_grid":
 
             input_topic = node_config["input_topic"] if "input_topic" in node_config else "lidar/points"
