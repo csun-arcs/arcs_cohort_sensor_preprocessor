@@ -67,3 +67,17 @@ nodes:
       output_camera_info_topic: camera/right_camera/image_thumbnail/camera_info
       width: 160
       height: 120
+
+    - name: left_camera_points_voxelizer
+      type: voxel_grid
+      input_topic: camera/left_camera/points
+      output_topic: camera/points/downsampled
+      filter_field_name: 'z'
+      filter_limit_min: 0.0
+      filter_limit_max: 5.0
+      filter_limit_negative: False
+      keep_organized: False
+      input_frame: False
+      output_frame: False
+      leaf_size: 0.05
+      min_points_per_voxe: 1
