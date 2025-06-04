@@ -226,6 +226,7 @@ def launch_setup(context, *args, **kwargs):
             input_frame = node_config["input_frame"] if "input_frame" in node_config else False
             output_frame = node_config["output_frame"] if "output_frame" in node_config else False
             leaf_size = node_config["leaf_size"] if "leaf_size" in node_config else 0.05
+            min_points_per_voxel = node_config["min_points_per_voxel"] if "min_points_per_voxel" in node_config else 1
 
             composable_nodes.append(
                 ComposableNode(
