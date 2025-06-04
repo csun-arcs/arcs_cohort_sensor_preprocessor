@@ -112,7 +112,7 @@ def launch_setup(context, *args, **kwargs):
                 Node(
                     package="laser_merger2",
                     executable="laser_merger2",
-                    name="laser_merger2",
+                    name=node_config["name"],
                     parameters=[{"target_frame": node_config["target_frame"]},
                                 {"scan_topics": scan_topics},
                                 {"scan_reliability_policies": scan_reliability_policies},
@@ -210,6 +210,163 @@ def launch_setup(context, *args, **kwargs):
                     parameters=[{
                         "width": width,
                         "height": height,
+                    }],
+                )
+            )
+
+        elif node_type == "passthrough":
+
+            input_topic = node_config["input_topic"] if "input_topic" in node_config else "lidar/points"
+            output_topic = node_config["output_topic"] if "output_topic" in node_config else "lidar/points/downsampled"
+            filter_field_name = node_config["filter_field_name"] if "filter_field_name" in node_config else 'z'
+            filter_limit_min = node_config["filter_limit_min"] if "filter_limit_min" in node_config else 0.0
+            filter_limit_max = node_config["filter_limit_max"] if "filter_limit_max" in node_config else 5.0
+            filter_limit_negative = node_config["filter_limit_negative"] if "filter_limit_negative" in node_config else False
+            keep_organized = node_config["keep_organized"] if "keep_organized" in node_config else False
+            input_frame = node_config["input_frame"] if "input_frame" in node_config else ""
+            output_frame = node_config["output_frame"] if "output_frame" in node_config else ""
+
+            composable_nodes.append(
+                ComposableNode(
+                    package="pcl_ros",
+                    plugin="pcl_ros::PassThrough",
+                    name=node_config["name"],
+                    remappings=[
+                        ("input", input_topic),
+                        ("output", output_topic),
+                    ],
+                    parameters=[{
+                        "filter_field_name": filter_field_name,
+                        "filter_limit_min": filter_limit_min,
+                        "filter_limit_max": filter_limit_max,
+                        "filter_limit_negative": filter_limit_negative,
+                        "keep_organized": keep_organized,
+                        "input_frame": input_frame,
+                        "output_frame": output_frame,
+                    }],
+                )
+            )
+
+        elif node_type == "radius_outlier_removal":
+
+            input_topic = node_config["input_topic"] if "input_topic" in node_config else "lidar/points"
+            output_topic = node_config["output_topic"] if "output_topic" in node_config else "lidar/points/downsampled"
+            min_neighbors = node_config["min_neighbors"] if "min_neighbors" in node_config else 5
+            radius_search = node_config["radius_search"] if "radius_search" in node_config else 0.1
+
+            composable_nodes.append(
+                ComposableNode(
+                    package="pcl_ros",
+                    plugin="pcl_ros::RadiusOutlierRemoval",
+                    name=node_config["name"],
+                    remappings=[
+                        ("input", input_topic),
+                        ("output", output_topic),
+                    ],
+                    parameters=[{
+                        "min_neighbors": min_neighbors,
+                        "radius_search": radius_search,
+                    }],
+                )
+            )
+
+        elif node_type == "statistical_outlier_removal":
+
+            input_topic = node_config["input_topic"] if "input_topic" in node_config else "lidar/points"
+            output_topic = node_config["output_topic"] if "output_topic" in node_config else "lidar/points/downsampled"
+            mean_k = node_config["mean_k"] if "mean_k" in node_config else 2
+            stddev = node_config["stddev"] if "stddev" in node_config else 0.0
+            negative = node_config["negative"] if "negative" in node_config else False
+
+            composable_nodes.append(
+                ComposableNode(
+                    package="pcl_ros",
+                    plugin="pcl_ros::StatisticalOutlierRemoval",
+                    name=node_config["name"],
+                    remappings=[
+                        ("input", input_topic),
+                        ("output", output_topic),
+                    ],
+                    parameters=[{
+                        "mean_k": mean_k,
+                        "stddev": stddev,
+                        "negative": negative,
+                    }],
+                )
+            )
+
+        elif node_type == "crop_box":
+
+            input_topic = node_config["input_topic"] if "input_topic" in node_config else "lidar/points"
+            output_topic = node_config["output_topic"] if "output_topic" in node_config else "lidar/points/downsampled"
+            min_x = node_config["min_x"] if "min_x" in node_config else -1.0
+            max_x = node_config["max_x"] if "max_x" in node_config else 1.0
+            min_y = node_config["min_y"] if "min_y" in node_config else -1.0
+            max_y = node_config["max_y"] if "max_y" in node_config else 1.0
+            min_z = node_config["min_z"] if "min_z" in node_config else -1.0
+            max_z = node_config["max_z"] if "max_z" in node_config else 1.0
+            keep_organized = node_config["keep_organized"] if "keep_organized" in node_config else False
+            negative = node_config["negative"] if "negative" in node_config else False
+            input_frame = node_config["input_frame"] if "input_frame" in node_config else ""
+            output_frame = node_config["output_frame"] if "output_frame" in node_config else ""
+
+            composable_nodes.append(
+                ComposableNode(
+                    package="pcl_ros",
+                    plugin="pcl_ros::CropBox",
+                    name=node_config["name"],
+                    remappings=[
+                        ("input", input_topic),
+                        ("output", output_topic),
+                    ],
+                    parameters=[{
+                        "min_x": min_x,
+                        "max_x": max_x,
+                        "min_y": min_y,
+                        "max_y": max_y,
+                        "min_z": min_z,
+                        "max_z": max_z,
+                        "keep_organized": keep_organized,
+                        "negative": negative,
+                        "input_frame": input_frame,
+                        "output_frame": output_frame,
+                    }],
+                )
+            )
+
+        elif node_type == "voxel_grid":
+
+            input_topic = node_config["input_topic"] if "input_topic" in node_config else "lidar/points"
+            output_topic = node_config["output_topic"] if "output_topic" in node_config else "lidar/points/downsampled"
+            filter_field_name = node_config["filter_field_name"] if "filter_field_name" in node_config else 'z'
+            filter_limit_min = node_config["filter_limit_min"] if "filter_limit_min" in node_config else 0.0
+            filter_limit_max = node_config["filter_limit_max"] if "filter_limit_max" in node_config else 5.0
+            filter_limit_negative = node_config["filter_limit_negative"] if "filter_limit_negative" in node_config else False
+            keep_organized = node_config["keep_organized"] if "keep_organized" in node_config else False
+            input_frame = node_config["input_frame"] if "input_frame" in node_config else False
+            output_frame = node_config["output_frame"] if "output_frame" in node_config else False
+            leaf_size = node_config["leaf_size"] if "leaf_size" in node_config else 0.05
+            min_points_per_voxel = node_config["min_points_per_voxel"] if "min_points_per_voxel" in node_config else 1
+
+            composable_nodes.append(
+                ComposableNode(
+                    package="pcl_ros",
+                    plugin="pcl_ros::VoxelGrid",
+                    name=node_config["name"],
+                    remappings=[
+                        ("input", input_topic),
+                        ("output", output_topic),
+                    ],
+                    parameters=[{
+                        "filter_field_name": filter_field_name,
+                        "filter_limit_min": filter_limit_min,
+                        "filter_limit_max": filter_limit_max,
+                        "filter_limit_negative": filter_limit_negative,
+                        "keep_organized": keep_organized,
+                        "input_frame": input_frame,
+                        "output_frame": output_frame,
+                        "leaf_size": leaf_size,
+                        "min_points_per_voxel": min_points_per_voxel,
                     }],
                 )
             )
