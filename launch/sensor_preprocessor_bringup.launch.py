@@ -73,6 +73,41 @@ def launch_setup(context, *args, **kwargs):
                 )
             )
 
+        elif node_type == "depthimage_to_laserscan":
+
+            input_depth_topic = node_config["input_depth_topic"] if "input_depth_topic" in node_config else "image/image_raw"
+            input_camera_info_topic = node_config["input_camera_info_topic"] if "input_camera_info_topic" in node_config else "image/camera_info"
+            output_scan_topic = node_config["output_scan_topic"] if "output_scan_topic" in node_config else "depthimage_scan"
+            scan_time = node_config["scan_time"] if "scan_time" in node_config else 0.033
+            scan_height = node_config["scan_height"] if "scan_height" in node_config else 1
+            range_min = node_config["range_min"] if "range_min" in node_config else 0.45
+            range_max = node_config["range_max"] if "range_max" in node_config else 10.0
+            target_frame = node_config["target_frame"] if "target_frame" in node_config else "base_link"
+            
+            nodes.append(
+                Node(
+                    package="depthimage_to_laserscan",
+                    executable="depthimage_to_laserscan_node",
+                    name=node_config["name"],
+                    parameters=[{
+                        "scan_time": scan_time,
+                        "scan_height": scan_height,
+                        "range_min": range_min,
+                        "range_max": range_max,
+                        "output_frame": target_frame,
+                    }],
+                    output="screen",
+                    arguments=["--ros-args", "--log-level", log_level],
+                    remappings=[
+                        ('/tf', 'tf'),
+                        ('/tf_static', 'tf_static'),
+                        ("depth", input_depth_topic),
+                        ("depth_camera_info", input_camera_info_topic),
+                        ("scan", output_scan_topic),
+                    ],
+                )
+            )
+
         elif node_type == "pointcloud_transformer":
             composable_nodes.append(
                 ComposableNode(

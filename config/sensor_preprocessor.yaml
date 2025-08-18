@@ -16,6 +16,17 @@ nodes:
       use_inf: True
       inf_epsilon: 1.0
 
+    # - name: left_camera_scan
+    #   type: depthimage_to_laserscan
+    #   input_depth_topic: camera/left_camera/depth_image
+    #   input_camera_info_topic: camera/left_camera/camera_info
+    #   output_scan_topic: camera/scan
+    #   target_frame: {prefix_}base_link
+    #   range_min: 0.5
+    #   range_max: 20.0
+    #   scan_time: 0.03333
+    #   scan_height: 200
+
     - name: scan_merger
       type: laser_merger2
       target_frame: {prefix_}base_link
